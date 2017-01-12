@@ -45,6 +45,9 @@ export default class ConfiguredLogstash {
     if (opts && opts.console === false) {
       winston.remove(winston.transports.Console);
     }
+    if (opts && opts.level) {
+      winston.level = opts.level;
+    }
 
     winston.info('Configured winston logging');
   }
