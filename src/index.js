@@ -16,20 +16,28 @@ export default class ConfiguredLogstash {
           throw new Error(`Invalid transport specified, missing module or name: ${spec}`);
         }
 
-        if (typeof spec.start === 'function') {
-          spec.start();
-        }
-
         // Some transports need clean shutdown, this method is used for that
         if (spec.stop) {
           this.shutdownFunctions.push(spec.stop);
+        } else if (spec.module && spec.module.stop) {
+          this.shutdownFunctions.push(spec.module.stop);
         }
 
         if (spec.name && !winston.transports[spec.name]) {
           throw new Error(`Transport ${spec.name} specified a name, but that is not a property on winston.transports`);
         }
 
-        winston.add(spec.name ? winston.transports[spec.name] : spec.module, spec.config);
+        let shouldAdd = true;
+        if (typeof spec.start === 'function') {
+          // If the start function returns true, that means they've already added the transport
+          shouldAdd = spec.start(spec.config) !== true;
+        } else if (spec.module && spec.module.start) {
+          // If the start function returns true, that means they've already added the transport
+          shouldAdd = spec.module.start(spec.config) !== true;
+        }
+        if (shouldAdd) {
+          winston.add(spec.name ? winston.transports[spec.name] : spec.module, spec.config);
+        }
       }
     }
 

@@ -2,6 +2,10 @@ export const status = {
   started: false,
 };
 
+export function startNoAdd() {
+  return true;
+}
+
 export function start() {
   status.started = true;
 }

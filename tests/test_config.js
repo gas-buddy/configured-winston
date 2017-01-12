@@ -18,6 +18,13 @@ tap.test('test_config', async (t) => {
   }
 
   try {
+    const unused = new LogConfig({}, { transports: { bad: { name: 'SDLKJ' } } });
+    t.notOk(unused, 'should throw');
+  } catch (error) {
+    t.match(error.message, /not a property on winston.transports/i, 'should throw useful error');
+  }
+
+  try {
     const config = {
       transports: {
         fake: {
@@ -28,6 +35,14 @@ tap.test('test_config', async (t) => {
             filename: '/var/log/foobar',
           },
           stop: fake.stop,
+        },
+        fakeFake: {
+          start: fake.startNoAdd,
+          name: 'File',
+          config: {
+            level: 'error',
+            filename: '/var/log/baz',
+          },
         },
         disabled: {
           enabled: false,
@@ -60,6 +75,9 @@ tap.test('test_config', async (t) => {
     t.match(content, /ERROR is enabled/, 'should log error');
     t.match(content, /"foo":true/, 'Should have wrapped metadata');
     t.match(content, /"bar":"baz"/, 'Should have wrapped metadata with function');
+
+    t.throws(() => fs.accessSync('/var/log/baz'), '/var/log/baz should not exist');
+
     t.ok(!fake.status.started, 'Should have stopped');
   } finally {
     mockfs.restore();

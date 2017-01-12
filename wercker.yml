@@ -1,7 +1,4 @@
-box: node
-
-services:
-  - logstash
+box: node:6
 
 build:
   steps:
@@ -23,6 +20,12 @@ build:
       name: build
       code: npm run build
 
+  after-steps:
+    - script:
+      name: Post to coveralls
+      code: |
+        npm install --silent coveralls
+        npm run --silent ci-coveralls
 deploy:
   steps:
     - script:
