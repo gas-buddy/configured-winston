@@ -1,0 +1,55 @@
+{
+  "name": "@gasbuddy/configured-winston",
+  "version": "1.0.0",
+  "description": "A configuration driven winston infrastructure",
+  "main": "build/index.js",
+  "config": {
+    "coverage": "--lines=80 --statements=80 --functions=80 --branches=60"
+  },
+  "scripts": {
+    "test": "tap --node-arg=-r --node-arg=babel-register tests/*.js",
+    "test-some": "tap --node-arg=-r --node-arg=babel-register",
+    "cover": "cross-env BABEL_ENV=test nyc tap tests/test_*.js && nyc check-coverage $npm_package_config_coverage && nyc report --reporter=text",
+    "ci-test": "cross-env NODE_ENV=test nyc tap -Rtap tests/test_*.js | tee .tap_output | tap -Rspec -",
+    "ci-cover": "nyc check-coverage $npm_package_config_coverage",
+    "lint": "eslint .",
+    "build": "babel src --out-dir build",
+    "prepublish": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:gas-buddy/gb-services.git/configured-winston.git"
+  },
+  "keywords": [
+    "logstash",
+    "gasbuddy"
+  ],
+  "author": "GasBuddy",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.4.5",
+    "babel-preset-gasbuddy": "^1",
+    "bluebird": "^3.2.1",
+    "cross-env": "^3.1.4",
+    "eslint": "^3.1.0",
+    "eslint-config-gasbuddy": "^1",
+    "mock-fs": "^3.12.1",
+    "tap": "^8.0.0"
+  },
+  "dependencies": {
+    "winston": "^2.3.0"
+  },
+  "nyc": {
+    "include": [
+      "src"
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "sourceMap": false,
+    "instrument": false,
+    "reporter": [
+      "lcov"
+    ]
+  }
+}
