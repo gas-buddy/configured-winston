@@ -4,6 +4,7 @@ import WrappedLogger from './WrappedLogger';
 export default class ConfiguredLogstash {
   constructor(context, opts) {
     this.shutdownFunctions = [];
+    this.meta = (opts || {}).meta;
 
     // We configure this right away - not waiting for start because
     // other hydrated objects probably want to have winston logging work
@@ -54,7 +55,7 @@ export default class ConfiguredLogstash {
 
   // eslint-disable-next-line class-methods-use-this
   start() {
-    this.rootLogger = new WrappedLogger(winston);
+    this.rootLogger = new WrappedLogger(winston, this.meta);
     return this.rootLogger;
   }
 
