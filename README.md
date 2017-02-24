@@ -1,6 +1,8 @@
 configured-winston
 ==================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/gas-buddy/configured-winston.svg)](https://greenkeeper.io/)
+
 [![wercker status](https://app.wercker.com/status/0c57068422ba008f646fc541d8357308/s/master "wercker status")](https://app.wercker.com/project/byKey/0c57068422ba008f646fc541d8357308)
 [![Coverage Status](https://coveralls.io/repos/github/gas-buddy/configured-winston/badge.svg?branch=master)](https://coveralls.io/github/gas-buddy/configured-winston?branch=master)
 
