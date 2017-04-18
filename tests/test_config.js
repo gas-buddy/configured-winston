@@ -2,6 +2,8 @@ import fs from 'fs';
 import tap from 'tap';
 import mockfs from 'mock-fs';
 import winston from 'winston';
+// Otherwise mock-fs will blow up when winston requires this
+import 'winston/lib/winston/transports/file';
 import LogConfig from '../src/index';
 import * as fake from './fake/fakeTransport';
 
