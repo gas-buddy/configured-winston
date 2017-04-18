@@ -60,7 +60,7 @@ tap.test('test_config', async (t) => {
     t.notOk(winston.default.transports.Console);
 
     const wrapped = logger
-      .loggerWithDefaults({ foo: true })
+      .loggerWithDefaults({ foo: true }, { addTimestamp: true, addCounter: true })
       .loggerWithDefaults(m => Object.assign({ bar: 'baz' }, m));
 
     wrapped.debug('DEBUG is enabled');
