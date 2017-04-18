@@ -2,9 +2,19 @@ export default class WrappedLogger {
   constructor(logger, additionalMetadata, options) {
     this.logger = logger;
     this.meta = additionalMetadata;
-    this.dynamic = options ? options.dynamicFields : null;
     this.counter = 1;
-    this.spanContext = logger.spanContext;
+
+    if (logger.spanContext) {
+      // Inherit the parent context
+      const id = logger.spanContext.id;
+      logger.spanContext.allocatedCount = (logger.spanContext.allocatedCount || 0) + 1;
+      this.spanContext = {
+        id: `${id || ''}${id ? '.' : ''}${logger.spanContext.allocatedCount}`,
+      };
+    } else if (options && options.spanId) {
+      // Externally created context
+      this.spanContext = { id: options.spanId };
+    }
 
     const needsDynamic = this.spanContext ||
       (options && (options.addTimestamp || options.addCounter));
@@ -12,13 +22,15 @@ export default class WrappedLogger {
       this.dynamic = () => {
         const addl = {};
 
-        if (options.addTimestamp) {
-          addl.ts = Date.now();
-        }
-        if (options.addCounter) {
-          const ctr = this.counter;
-          this.counter += 1;
-          addl.ctr = ctr;
+        if (options) {
+          if (options.addTimestamp) {
+            addl.ts = Date.now();
+          }
+          if (options.addCounter) {
+            const ctr = this.counter;
+            this.counter += 1;
+            addl.ctr = ctr;
+          }
         }
         if (this.spanContext) {
           addl.span = this.spanId;
@@ -37,59 +49,17 @@ export default class WrappedLogger {
       }
       const base = this.dynamic ? this.dynamic() : {};
       return Object.assign(base, this.meta, meta);
+    } else if (this.dynamic) {
+      return Object.assign(this.dynamic(), meta);
     }
     return meta;
   }
 
-  pushSpan() {
+  loggerWithNewSpan() {
     if (!this.spanContext) {
       this.spanContext = {};
     }
-    const c = this.spanContext;
-
-    if (!c.id) {
-      c.id = '1';
-      c.ids = [1];
-      c.counts = [1];
-    } else {
-      if (c.counts.length === c.ids.length) {
-        c.counts.push(1);
-      } else {
-        c.counts[c.counts.length - 1] += 1;
-      }
-      c.ids.push(c.counts[c.counts.length - 1]);
-      c.id = c.ids.join('.');
-    }
-  }
-
-  popSpan() {
-    const c = this.spanContext;
-    if (!c.id) {
-      this.logger.error('popSpan called without an active span', { stack: new Error().stack });
-      return;
-    }
-    if (!c.counts[c.ids.length - 1]) {
-      this.logger.error('popSpan called on a span this process did not create', {
-        spanId: this.spanId,
-        stack: new Error().stack,
-      });
-      return;
-    }
-    c.ids = c.ids.slice(0, c.ids.length - 1);
-    c.id = c.ids.join('.');
-  }
-
-  importSpan(spanId) {
-    if (this.spanContext) {
-      this.logger.error('Importing a spanId on a logger which already has spans',
-        { stack: new Error().stack });
-      return;
-    }
-    this.spanContext = {
-      id: spanId,
-      ids: spanId.split('.'),
-    };
-    this.spanContext.counts = new Array(this.spanContext.ids.length);
+    return new WrappedLogger(this);
   }
 
   get spanId() {
