@@ -42,17 +42,22 @@ export default class WrappedLogger {
   }
 
   applyAdditionalMetadata(meta) {
+    let wrappedMeta = meta;
+    if (meta instanceof Error) {
+      wrappedMeta = { error: meta };
+    }
+
     // Because of the ordering, passed in metadata wins
     if (this.meta) {
       if (typeof this.meta === 'function') {
-        return this.meta(meta);
+        return this.meta(wrappedMeta);
       }
       const base = this.dynamic ? this.dynamic() : {};
-      return Object.assign(base, this.meta, meta);
+      return Object.assign(base, this.meta, wrappedMeta);
     } else if (this.dynamic) {
-      return Object.assign(this.dynamic(), meta);
+      return Object.assign(this.dynamic(), wrappedMeta);
     }
-    return meta;
+    return wrappedMeta;
   }
 
   loggerWithNewSpan() {
