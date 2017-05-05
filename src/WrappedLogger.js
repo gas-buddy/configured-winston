@@ -2,6 +2,44 @@ const metadataBlacklist = [
   'response',
 ];
 
+/* Replace properties are deeper than 5 levels with "[Too Deep]"
+    Replace functions with "[Function]".
+    Replace duplicate objects with "[Duplicate]".
+    Replace blacklisted properties with "[Blacklisted]"
+*/
+function trimMetadata(object, depth, traversedObjects) {
+  if (depth > 4 || typeof object !== 'object' || !object) {
+    return '[Too Deep]';
+  }
+  const props = Object.getOwnPropertyNames(object);
+  const copy = {};
+  props.forEach((k) => {
+    if (metadataBlacklist.includes(k)) {
+      copy[k] = '[Blacklisted]';
+      return;
+    }
+    const v = object[k];
+    if (typeof object === 'object') {
+      if (traversedObjects.includes(v)) {
+        copy[k] = '[Duplicate]';
+        return;
+      }
+      traversedObjects.push(v);
+    }
+    if (typeof v === 'function') {
+      copy[k] = '[Function]';
+    } else if (typeof v === 'object' && v) {
+      const newValue = trimMetadata(v, depth + 1, traversedObjects);
+      if (newValue) {
+        copy[k] = newValue;
+      }
+    } else {
+      copy[k] = v;
+    }
+  });
+  return copy;
+}
+
 export default class WrappedLogger {
   constructor(logger, additionalMetadata, options) {
     this.logger = logger;
@@ -46,47 +84,7 @@ export default class WrappedLogger {
   }
 
   applyAdditionalMetadata(meta) {
-    const traversedObjects = [];
-
-    /* Replace properties are deeper than 5 levels with "[Too Deep]"
-       Replace functions with "[Function]".
-       Replace duplicate objects with "[Duplicate]".
-       Replace blacklisted properties with "[Blacklisted]"
-    */
-    function trimMetadata(object, depth) {
-      if (depth > 4 || typeof object !== 'object' || !object) {
-        return '[Too Deep]';
-      }
-      const props = Object.getOwnPropertyNames(object);
-      const copy = {};
-      props.forEach((k) => {
-        if (metadataBlacklist.includes(k)) {
-          copy[k] = '[Blacklisted]';
-          return;
-        }
-        const v = object[k];
-        if (typeof object === 'object') {
-          if (traversedObjects.includes(v)) {
-            copy[k] = '[Duplicate]';
-            return;
-          }
-          traversedObjects.push(v);
-        }
-        if (typeof v === 'function') {
-          copy[k] = '[Function]';
-        } else if (typeof v === 'object' && v) {
-          const newValue = trimMetadata(v, depth + 1);
-          if (newValue) {
-            copy[k] = newValue;
-          }
-        } else {
-          copy[k] = v;
-        }
-      });
-      return copy;
-    }
-
-    const fullMeta = trimMetadata(meta, 0);
+    const fullMeta = trimMetadata(meta, 0, []);
 
     // Because of the ordering, passed in metadata wins
     if (this.meta) {
