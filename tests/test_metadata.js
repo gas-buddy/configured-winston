@@ -5,7 +5,8 @@ tap.test('test_metadata', async (t) => {
   const configured = new LogConfig({ name: 'test' }, { console: process.env.NODE_ENV !== 'test' });
   const logger = await configured.start();
 
-  const wrapped = logger.loggerWithDefaults({ foo: true });
+  const defaults = { foo: true };
+  const wrapped = logger.loggerWithDefaults(defaults);
 
   const duplicateObject = {
     field: 'field',
@@ -35,4 +36,5 @@ tap.test('test_metadata', async (t) => {
   t.strictEquals(typeof trimmedMetadata.duplicateObject, 'object', 'First duplicate should not be replaced.');
   t.strictEquals(trimmedMetadata.deeper.duplicateObject, '[Duplicate]', 'Second duplicate should be replaced.');
   t.strictEquals(trimmedMetadata.deeper.deeper.deeper.deeper.deeper, '[Too Deep]', 'Fields more than 5 levels deep should be removed.');
+  t.deepEquals(wrapped.applyAdditionalMetadata(), defaults, 'Null metadata gets only defaults');
 });

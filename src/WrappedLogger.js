@@ -8,9 +8,14 @@ const metadataBlacklist = [
     Replace blacklisted properties with "[Blacklisted]"
 */
 function trimMetadata(object, depth, traversedObjects) {
-  if (depth > 4 || typeof object !== 'object' || !object) {
+  if (typeof object !== 'object' || !object) {
+    return object;
+  }
+
+  if (depth > 4) {
     return '[Too Deep]';
   }
+
   const props = Object.getOwnPropertyNames(object);
   const copy = {};
   props.forEach((k) => {
