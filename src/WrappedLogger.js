@@ -12,7 +12,11 @@ function trimMetadata(object, depth, traversedObjects) {
     return object;
   }
 
-  if (depth > 4) {
+  if (object instanceof Buffer) {
+    return '[Buffer]';
+  }
+
+  if (depth > 5) {
     return '[Too Deep]';
   }
 
@@ -23,25 +27,22 @@ function trimMetadata(object, depth, traversedObjects) {
       copy[k] = '[Blacklisted]';
       return;
     }
+
     const v = object[k];
-    if (typeof object === 'object') {
-      if (traversedObjects.includes(v)) {
-        copy[k] = '[Duplicate]';
-        return;
-      }
-      traversedObjects.push(v);
-    }
     if (typeof v === 'function') {
       copy[k] = '[Function]';
-    } else if (typeof v === 'object' && v) {
-      const newValue = trimMetadata(v, depth + 1, traversedObjects);
-      if (newValue) {
-        copy[k] = newValue;
-      }
+    } else if (traversedObjects.includes(v)) {
+      copy[k] = '[Duplicate]';
     } else {
-      copy[k] = v;
+      traversedObjects.push(v);
+      if (typeof v === 'object' && v) {
+        copy[k] = trimMetadata(v, depth + 1, traversedObjects);
+      } else {
+        copy[k] = v;
+      }
     }
   });
+
   return copy;
 }
 
@@ -89,7 +90,7 @@ export default class WrappedLogger {
   }
 
   applyAdditionalMetadata(meta) {
-    const fullMeta = trimMetadata(meta, 0, []);
+    const fullMeta = meta ? trimMetadata({ meta }, 0, []) : {};
 
     // Because of the ordering, passed in metadata wins
     if (this.meta) {
