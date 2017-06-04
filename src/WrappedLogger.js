@@ -90,7 +90,8 @@ export default class WrappedLogger {
   }
 
   applyAdditionalMetadata(meta) {
-    const fullMeta = meta ? trimMetadata({ meta }, 0, []) : {};
+    const metaWrap = typeof meta === 'object' ? meta : { meta };
+    const fullMeta = meta ? trimMetadata(metaWrap, 0, []) : {};
 
     // Because of the ordering, passed in metadata wins
     if (this.meta) {
