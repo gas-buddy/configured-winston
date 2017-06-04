@@ -1,6 +1,6 @@
 {
   "name": "@gasbuddy/configured-winston",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "A configuration driven winston infrastructure",
   "main": "build/index.js",
   "config": {
@@ -27,17 +27,17 @@
   "author": "GasBuddy",
   "license": "MIT",
   "devDependencies": {
-    "babel-cli": "^6.4.5",
+    "babel-cli": "^6.24.1",
     "babel-preset-gasbuddy": "^2",
-    "cross-env": "^4",
-    "eslint": "^3.1.0",
+    "cross-env": "^5",
+    "eslint": "^3.19.0",
     "eslint-config-gasbuddy": "^2",
     "mock-fs": "^4.0.0",
-    "nyc": "^10.2.0",
+    "nyc": "^11.0.0",
     "tap": "^10.2.1"
   },
   "dependencies": {
-    "winston": "^2.3.0"
+    "winston": "^2.3.1"
   },
   "nyc": {
     "include": [

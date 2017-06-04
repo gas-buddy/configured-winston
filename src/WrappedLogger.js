@@ -31,7 +31,7 @@ function trimMetadata(object, depth, traversedObjects) {
     const v = object[k];
     if (typeof v === 'function') {
       copy[k] = '[Function]';
-    } else if (traversedObjects.includes(v)) {
+    } else if (traversedObjects.includes(v) && String(v).length > 12) {
       copy[k] = '[Duplicate]';
     } else {
       traversedObjects.push(v);

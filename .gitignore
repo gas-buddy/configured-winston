@@ -4,6 +4,7 @@
 coverage
 .tap_output
 .wercker
+.vscode
 
 # Stock
 *.seed

@@ -6,6 +6,8 @@ export default class ConfiguredLogstash {
     const opts = options || {};
     this.shutdownFunctions = [];
     this.meta = opts.meta;
+    this.addTimestamp = opts.addTimestamp;
+    this.addCounter = opts.addCounter;
 
     // We configure this right away - not waiting for start because
     // other hydrated objects probably want to have winston logging work
@@ -63,7 +65,10 @@ export default class ConfiguredLogstash {
 
   // eslint-disable-next-line class-methods-use-this
   start() {
-    this.rootLogger = new WrappedLogger(winston, this.meta);
+    this.rootLogger = new WrappedLogger(winston, this.meta, {
+      addTimestamp: this.addTimestamp,
+      addCounter: this.addCounter,
+    });
     return this.rootLogger;
   }
 
