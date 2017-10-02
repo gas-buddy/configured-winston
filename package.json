@@ -27,17 +27,16 @@
   "author": "GasBuddy",
   "license": "MIT",
   "devDependencies": {
-    "babel-cli": "^6.24.1",
-    "babel-preset-gasbuddy": "^2",
+    "babel-cli": "^6.26.0",
+    "babel-preset-gasbuddy": "^2.6.0",
     "cross-env": "^5",
-    "eslint": "^3.19.0",
-    "eslint-config-gasbuddy": "^2",
-    "mock-fs": "^4.0.0",
+    "eslint-config-gasbuddy": "^4",
+    "mock-fs": "^4.4.1",
     "nyc": "^11.0.0",
-    "tap": "^10.2.1"
+    "tap": "^10.7.2"
   },
   "dependencies": {
-    "winston": "^2.3.1"
+    "winston": "^2.4.0"
   },
   "nyc": {
     "include": [
