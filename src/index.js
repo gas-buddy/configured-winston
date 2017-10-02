@@ -34,7 +34,14 @@ export default class ConfiguredLogstash {
             shouldAdd = spec.module.start(spec.config) !== true;
           }
           if (shouldAdd) {
-            winston.add(spec.name ? winston.transports[spec.name] : spec.module, spec.config);
+            try {
+              winston.add(spec.name ? winston.transports[spec.name] : spec.module, spec.config);
+            } catch (error) {
+              if (process.env.NODE_ENV !== 'test' ||
+                !error.message.match(/Transport already attached/)) {
+                throw error;
+              }
+            }
           }
 
           // Some transports need clean shutdown, this method is used for that
@@ -54,7 +61,13 @@ export default class ConfiguredLogstash {
 
     // As a convenience, you can configure this module to REMOVE the console logger
     if (opts && opts.console === false) {
-      winston.remove(winston.transports.Console);
+      try {
+        winston.remove(winston.transports.Console);
+      } catch (error) {
+        if (!error.message.match(/Transport console not attached/)) {
+          throw error;
+        }
+      }
     }
     if (opts && opts.level) {
       winston.level = opts.level;
