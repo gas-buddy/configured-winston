@@ -7,8 +7,12 @@ const metadataBlacklist = [
     Replace duplicate objects with "[Duplicate]".
     Replace blacklisted properties with "[Blacklisted]"
 */
+function isNonArrayObject(object) {
+  return (object && typeof object === 'object' && !Array.isArray(object));
+}
+
 function trimMetadata(object, depth, traversedObjects) {
-  if (typeof object !== 'object' || !object) {
+  if (!isNonArrayObject(object)) {
     return object;
   }
 
@@ -31,15 +35,15 @@ function trimMetadata(object, depth, traversedObjects) {
     const v = object[k];
     if (typeof v === 'function') {
       copy[k] = '[Function]';
-    } else if (traversedObjects.includes(v) && String(v).length > 12) {
-      copy[k] = '[Duplicate]';
-    } else {
-      traversedObjects.push(v);
-      if (typeof v === 'object' && v) {
-        copy[k] = trimMetadata(v, depth + 1, traversedObjects);
+    } else if (isNonArrayObject(v)) {
+      if (traversedObjects.includes(v) && String(v).length > 12) {
+        copy[k] = '[Duplicate]';
       } else {
-        copy[k] = v;
+        traversedObjects.push(v);
+        copy[k] = trimMetadata(v, depth + 1, traversedObjects);
       }
+    } else {
+      copy[k] = v;
     }
   });
 
@@ -90,7 +94,7 @@ export default class WrappedLogger {
   }
 
   applyAdditionalMetadata(meta) {
-    const metaWrap = typeof meta === 'object' ? meta : { meta };
+    const metaWrap = isNonArrayObject(meta) ? meta : { meta };
     const fullMeta = meta ? trimMetadata(metaWrap, 0, []) : {};
 
     // Because of the ordering, passed in metadata wins
