@@ -1,6 +1,6 @@
 {
   "name": "@gasbuddy/configured-winston",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "A configuration driven winston infrastructure",
   "main": "build/index.js",
   "config": {
