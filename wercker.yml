@@ -1,4 +1,4 @@
-box: gasbuddy/node-app:8-wercker
+box: node:8
 
 build:
   steps:
