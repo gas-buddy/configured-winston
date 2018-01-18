@@ -1,7 +1,7 @@
 const metadataBlacklist = (process.env.NODE_ENV === 'production') ? [
   'response',
   '_object', // joi validation errors put the (potentially sensitive) json here
-] : [];
+] : ['response']; // With a cluster-wide proxy, printing response even in dev is just annoying
 
 /* Replace properties are deeper than 5 levels with "[Too Deep]"
     Replace functions with "[Function]".
