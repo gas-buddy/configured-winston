@@ -84,17 +84,13 @@ export default class ConfiguredLogstash {
       addTimestamp: this.addTimestamp,
       addCounter: this.addCounter,
     });
-    
+
     if (this.listenForUnhandleRejection) {
-      process.on('unhandledRejection', err => 
-        this.rootLogger.error('unhandled rejection', err)
-      );
+      process.on('unhandledRejection', err => this.rootLogger.error('unhandled rejection', err));
     }
 
     if (this.listenForUncaughtException) {
-      process.on('uncaughtException', err =>
-        this.rootLogger.error('uncaught exception', err)
-      );
+      process.on('uncaughtException', err => this.rootLogger.error('uncaught exception', err));
     }
 
     return this.rootLogger;
