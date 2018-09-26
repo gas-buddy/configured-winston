@@ -86,7 +86,8 @@ export default class ConfiguredLogstash {
   }
 
   async stop() {
-    winston.info('Winston login shutdown beginning');
+    // Wait for transports to flush
+    await new Promise(accept => winston.info('Winston login shutdown beginning', accept));
     const promises = this.shutdownFunctions.map(f => f());
     await Promise.all(promises);
   }
