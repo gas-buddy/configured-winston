@@ -8,6 +8,8 @@ export default class ConfiguredLogstash {
     this.meta = opts.meta;
     this.addTimestamp = opts.addTimestamp;
     this.addCounter = opts.addCounter;
+    this.listenForUnhandledRejection = opts.listenForUnhandleRejection;
+    this.listenForUncaughtException = opts.listenForUncaughtException;
 
     // We configure this right away - not waiting for start because
     // other hydrated objects probably want to have winston logging work
@@ -82,6 +84,15 @@ export default class ConfiguredLogstash {
       addTimestamp: this.addTimestamp,
       addCounter: this.addCounter,
     });
+
+    if (this.listenForUnhandleRejection) {
+      process.on('unhandledRejection', err => this.rootLogger.error('unhandled rejection', err));
+    }
+
+    if (this.listenForUncaughtException) {
+      process.on('uncaughtException', err => this.rootLogger.error('uncaught exception', err));
+    }
+
     return this.rootLogger;
   }
 
